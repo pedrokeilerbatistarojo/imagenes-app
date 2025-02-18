@@ -1,9 +1,10 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
+  <q-layout view="lHh Lpr lFf" class="bg-body">
+    <q-header class="bg-white" elevated>
       <q-toolbar>
         <q-btn
           flat
+          color="dark"
           dense
           round
           icon="menu"
@@ -12,10 +13,8 @@
         />
 
         <q-toolbar-title>
-          Quasar App
         </q-toolbar-title>
 
-        <div>Quasar v{{ $q.version }}</div>
       </q-toolbar>
     </q-header>
 
@@ -28,7 +27,9 @@
         <q-item-label
           header
         >
-          Essential Links
+          <div class="flex items-center">
+            <img class="logo-image" src="~assets/img-logo.png" alt="Img Logo" />
+          </div>
         </q-item-label>
 
         <EssentialLink
@@ -94,9 +95,14 @@ const linksList = [
   }
 ]
 
-const leftDrawerOpen = ref(false)
+const leftDrawerOpen = ref(true);
 
-function toggleLeftDrawer () {
-  leftDrawerOpen.value = !leftDrawerOpen.value
-}
+const toggleLeftDrawer = () => leftDrawerOpen.value = !leftDrawerOpen.value
 </script>
+
+
+<style>
+.q-layout__shadow:after {
+  box-shadow: 0 0 10px -3px rgba(0, 0, 0, 0.2), 0 0 0 rgba(0, 0, 0, -1)!important;
+}
+</style>
