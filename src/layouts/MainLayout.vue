@@ -13,6 +13,11 @@
         />
 
         <q-toolbar-title>
+          <div
+            class="q-pa-md float-right"
+          >
+
+          </div>
         </q-toolbar-title>
 
       </q-toolbar>

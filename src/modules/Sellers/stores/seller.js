@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { api } from 'boot/axios';
 import {Seller} from "src/modules/Sellers/models/Seller.js";
+import SellerService from "src/modules/Sellers/services/SellerService.js";
 
 export const useSellerStore = defineStore('seller', {
   state: () => ({
@@ -17,7 +18,10 @@ export const useSellerStore = defineStore('seller', {
       await api
         .get('/sellers', {params})
         .then((response) => {
-          this.sellers = response.data.map(sellerData => Seller(sellerData));
+          this.sellers = response.data.map(sellerData => Seller({
+            ...sellerData,
+            avatar: SellerService.getAvatarUrl(),
+          }));
         })
         .catch((error) => (this.error = error))
         .finally(() => {
