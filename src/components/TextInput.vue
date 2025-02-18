@@ -1,14 +1,4 @@
 <template>
-<!--  <q-input-->
-<!--    rounded-->
-<!--    outlined-->
-<!--    dense-->
-<!--    :disable="disable"-->
-<!--    v-model="textValue"-->
-<!--    type="text"-->
-<!--    :maxlength="maxSpaces"-->
-<!--  />-->
-
   <q-input
     bottom-slots
     v-model="textValue"
@@ -24,10 +14,6 @@
     </template>
     <template v-slot:append>
       <q-icon name="close" @click="textValue = ''" class="cursor-pointer" />
-    </template>
-
-    <template v-slot:hint>
-      Inserte las palabras claves para buscar imágenes
     </template>
   </q-input>
 </template>
