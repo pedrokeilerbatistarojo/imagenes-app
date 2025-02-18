@@ -1,5 +1,5 @@
 export class SearchService {
-  async searchImages(query, page = 1, perPage = 10) {
+  async searchImages() {
     throw new Error('searchImages method must be implemented');
   }
 }

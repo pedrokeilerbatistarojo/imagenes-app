@@ -2,19 +2,20 @@
   <div class="row">
     <div class="col-12">
       <TextInput
+        bg-color="white"
         v-model="query"
         label="Buscar imágenes"
         outlined
         class="q-mb-md"
         @keyup.enter="fetchImages"
       />
-      <spinner v-if="loading" />
+      <SpinnerLoading v-if="loading" />
       <div v-else class="image-grid">
         <q-card v-for="photo in photos" :key="photo.id" class="q-ma-sm" flat bordered>
           <q-img :src="photo.urls.small" :alt="photo.alt_description" fit="cover" style="height: 200px" />
         </q-card>
       </div>
-      <div class="flex flex-center">
+      <div v-if="empty" class="flex flex-center">
          <span>
            <q-icon name="sentiment_very_dissatisfied" /> No hay imágenes para mostrar
          </span>
@@ -24,21 +25,21 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import {computed, ref} from 'vue';
 import {serviceContainer} from "src/modules/Images/services/ServiceContainer.js";
 import TextInput from "components/TextInput.vue";
 import {storeToRefs} from "pinia";
 import {useGalleryStore} from "src/modules/Images/stores/gallery.js";
-import Skeleton from "components/Spinner.vue";
-import Spinner from "components/Spinner.vue";
+import SpinnerLoading from "components/SpinnerLoading.vue";
 
-const { loading, error } = storeToRefs(useGalleryStore());
+const { loading } = storeToRefs(useGalleryStore());
 
 const query = ref('');
 const photos = ref([]);
 const perPage = 20;
 const page = 1;
 
+const empty = computed(() => photos.value.length === 0 && query.value !== '');
 
 const fetchImages = async () => {
   try {
