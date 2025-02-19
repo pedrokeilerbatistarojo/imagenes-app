@@ -6,4 +6,6 @@ export const Seller = (data) => ({
   observations: data.observations || '',
   status: data.status === 'active' ? 'Activo' : 'Inactivo',
   images: data.images || [],
+  score: data.score || 0,
+  isWinner: data.isWinner || false,
 });

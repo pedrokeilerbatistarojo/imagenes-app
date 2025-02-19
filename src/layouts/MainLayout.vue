@@ -53,25 +53,19 @@
 
 <script setup>
 import { ref } from 'vue'
-import EssentialLink from 'components/EssentialLink.vue'
+import EssentialLink from 'src/modules/shared/components/EssentialLink.vue'
 
 const linksList = [
   {
-    title: 'Inicio',
+    title: 'Vendedores',
     caption: 'Información General',
-    icon: 'home',
+    icon: 'group',
     link: { name: 'home' }
   },
   {
     title: 'Imágenes',
     caption: 'Buscar Imágenes',
     icon: 'search',
-    link: { name: 'images' }
-  },
-  {
-    title: 'Factura',
-    caption: 'Factura electrónica',
-    icon: 'description',
     link: { name: 'images' }
   },
 ]

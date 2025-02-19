@@ -10,7 +10,7 @@ const unsplash = createApi({
 });
 
 export class UnsplashService extends SearchService {
-  async searchImages(query, page = 1, perPage = 10) {
+  async searchImages(query, page = 1, perPage = 30) {
     loading.value = true;
 
     try {

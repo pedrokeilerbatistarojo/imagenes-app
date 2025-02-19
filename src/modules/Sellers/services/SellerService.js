@@ -1,5 +1,6 @@
 import {useSellerStore} from "src/modules/Sellers/stores/seller.js";
 import {Image} from "src/modules/Images/models/Image.js";
+import configImages from "src/modules/Images/config/configImages.js";
 
 export default {
   assignImagesToSellers(images) {
@@ -42,5 +43,13 @@ export default {
   getAvatarUrl()  {
     const randomId = Math.floor(Math.random() * 6) + 1;
     return `https://cdn.quasar.dev/img/avatar${randomId}.jpg`;
+  },
+  setScore(sellerId, points){
+    const sellerStore = useSellerStore();
+    sellerStore.updateScore(sellerId, points);
+  },
+  getMissingScore(score){
+    if (score >= configImages.winnerPoints) return 0;
+    return configImages.winnerPoints - score;
   }
 };

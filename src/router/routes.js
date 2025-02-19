@@ -6,7 +6,7 @@ const routes = [
       {
         name:'home',
         path: '',
-        component: () => import('pages/IndexPage.vue')
+        component: () => import('src/modules/shared/pages/IndexPage.vue')
       },
       {
         name:'images',
@@ -20,7 +20,7 @@ const routes = [
   // but you can also remove it
   {
     path: '/:catchAll(.*)*',
-    component: () => import('pages/ErrorNotFound.vue')
+    component: () => import('src/modules/shared/pages/ErrorNotFound.vue')
   }
 ]
 

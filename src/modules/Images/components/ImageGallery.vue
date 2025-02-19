@@ -50,18 +50,24 @@
 <script setup>
 import {computed, ref, watch} from 'vue';
 import {serviceContainer} from "src/modules/Images/services/ServiceContainer.js";
-import TextInput from "components/TextInput.vue";
+import TextInput from "src/modules/shared/components/TextInput.vue";
 import {storeToRefs} from "pinia";
 import {useGalleryStore} from "src/modules/Images/stores/gallery.js";
-import SpinnerLoading from "components/SpinnerLoading.vue";
+import SpinnerLoading from "src/modules/shared/components/SpinnerLoading.vue";
 import InputValidationService from "src/modules/Images/services/InputValidationService.js";
-import { useQuasar } from 'quasar';
+import {useSuccessNotification} from "src/modules/shared/services/successNotification.js";
+import configImages from "src/modules/Images/config/configImages.js";
+import {useErrorNotification} from "src/modules/shared/services/errorNotificaction.js";
+import SearchSellerService from "src/modules/Sellers/services/SearchSellerService.js";
+import SellerService from "src/modules/Sellers/services/SellerService.js";
 
 const { loading, images } = storeToRefs(useGalleryStore());
-const $q = useQuasar();
+
 const query = ref('');
-const perPage = 20;
-const page = 1;
+const { perPage, page } = configImages;
+
+const successNotification = useSuccessNotification();
+const errorNotification = useErrorNotification();
 
 const empty = computed(() => images.value.length === 0 && query.value !== '');
 
@@ -73,25 +79,27 @@ const fetchImagesData = async () => {
   try {
     await serviceContainer.searchService.searchImages(query.value, page, perPage);
   } catch (error) {
-    console.error('Error al cargar las imágenes:', error);
+    errorNotification.notifyError(error);
   }
 };
 
-const lengthStr = 20;
-const sliceStr = (textDescription) => textDescription.slice(0, lengthStr);
+const lengthDescription = configImages.descriptionLength;
+const sliceStr = (textDescription) => textDescription.slice(0, lengthDescription);
 
 const handleSelectPicture = (id) => {
   const index = images.value.findIndex((image) => image.id === id);
   images.value[index].selected = !images.value[index].selected;
+  const sellerSelected =  SearchSellerService.getSellerByImageId(id);
 
-  $q.notify({
-    color: 'green-4',
-    textColor: 'white',
-    position: 'top',
-    icon: 'cloud_done',
-    message: 'Imagen seleccionada correctamente',
-  });
+  if (images.value[index].selected) {
+    SellerService.setScore(sellerSelected.id, configImages.pointsPerImage);
+  }else{
+    SellerService.setScore(sellerSelected.id, -configImages.pointsPerImage);
+  }
 
+  if  (sellerSelected.isWinner) {
+    successNotification.notifySuccess(`El vendedor ${sellerSelected.name} ha alcanzado ${sellerSelected.score} puntos`);
+  }
 };
 
 watch(query, (newVal) => {
