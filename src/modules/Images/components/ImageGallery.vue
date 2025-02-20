@@ -38,7 +38,7 @@
           <q-img :src="image.urls.small" :alt="image.alt_description" fit="cover" style="height: 200px" />
         </q-card>
       </div>
-      <div v-if="empty" class="flex flex-center">
+      <div v-show="empty" class="flex flex-center">
          <span class="bg-gray-2 q-pa-md">
            <q-icon name="sentiment_very_dissatisfied" /> No hay imágenes para mostrar
          </span>
@@ -68,7 +68,7 @@ const { perPage, page } = configImages;
 
 const successNotification = useSuccessNotification();
 const errorNotification = useErrorNotification();
-const empty = computed(() => images.value.length === 0 && query.value !== '');
+const empty = computed(() => images.value.length === 0 && !loading.value);
 
 const handleSearchImages = async() => {
   try {
