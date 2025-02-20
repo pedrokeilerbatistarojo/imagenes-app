@@ -8,15 +8,15 @@
         v-model="query"
         label="Buscar vendedores"
         outlined
-        @keyup.enter="handleSearchSeller"
+        @update:modelValue="handleSearchSeller"
       />
     </div>
     <div class="col-12 col-sm-4 col-md-3 col-lg-2">
       <GenericButton
         class="float-right full-width sm:inline"
         label="Generar Factura"
-        :loading="loading"
         :disable="!existWinner"
+        :loading="loadingInvoice"
         @click="handleGenerateInvoice"
       />
     </div>
@@ -80,6 +80,7 @@
               <BadgeComponent class="q-mx-sm" color="red" :textValue="missingPoint(seller.score)" />
             </div>
           </q-item-section>
+          <q-tooltip>Ver detalles de {{seller.name}}</q-tooltip>
         </q-item>
 
         <q-separator inset="item" />
@@ -119,8 +120,11 @@ const sellerSelected = ref(null);
 const sellersSort = computed(() => SellerService.sortSellersByScore(sellerList.value));
 const query = ref('');
 const sellerList = ref([]);
+const loadingInvoice = ref(false);
 
 onMounted(() => {
+  sellerList.value = SearchSellerService.getStoreSellers();
+
   if(isEmptySellers.value){
     handleFetchSellers();
   }
@@ -151,6 +155,7 @@ const handleCancelDialog = () => {
 }
 
 const handleGenerateInvoice = () => {
+  loadingInvoice.value = true;
   if(existWinner.value){
     InvoiceService.createInvoice().then(() => {
       if (error.value) {
@@ -158,6 +163,8 @@ const handleGenerateInvoice = () => {
       }else{
         successNotification.notifySuccess("Factura generada correctamente");
       }
+    }).finally(() => {
+      loadingInvoice.value = false;
     });
   }
 };

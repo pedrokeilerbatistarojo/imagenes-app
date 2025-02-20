@@ -38,11 +38,7 @@
           <q-img :src="image.urls.small" :alt="image.alt_description" fit="cover" style="height: 200px" />
         </q-card>
       </div>
-      <div v-show="empty" class="flex flex-center">
-         <span class="bg-gray-2 q-pa-md">
-           <q-icon name="sentiment_very_dissatisfied" /> No hay imágenes para mostrar
-         </span>
-      </div>
+      <EmptyImageBanner v-show="empty" />
     </div>
   </div>
 </template>
@@ -60,6 +56,7 @@ import configImages from "src/modules/Images/config/configImages.js";
 import {useErrorNotification} from "src/modules/shared/services/errorNotificaction.js";
 import SearchSellerService from "src/modules/Sellers/services/SearchSellerService.js";
 import SellerService from "src/modules/Sellers/services/SellerService.js";
+import EmptyImageBanner from "src/modules/Images/components/EmptyImageBanner.vue";
 
 const { loading, images } = storeToRefs(useGalleryStore());
 

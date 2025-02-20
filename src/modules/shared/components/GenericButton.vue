@@ -3,6 +3,7 @@
     color="primary"
     text-color="white"
     class="btn-pb shadow-0"
+    :loading="loading"
   />
 </template>
 

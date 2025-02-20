@@ -34,11 +34,12 @@
       </q-card-section>
 
       <q-card-section>
-        <div  class="row q-col-gutter-md">
+        <div v-if="seller.images.length > 0"  class="row q-col-gutter-md">
           <q-card v-for="image in seller.images" :key="image.id" class="col-3 q-pt-sm" flat>
             <q-img :src="image.urls.small" :alt="image.alt_description" fit="cover" style="height: 100px" />
           </q-card>
         </div>
+        <EmptyImageBanner v-else />
       </q-card-section>
 
       <q-separator />
@@ -52,6 +53,7 @@
 
 <script setup>
 import BadgeComponent from "src/modules/shared/components/BadgeComponent.vue";
+import EmptyImageBanner from "src/modules/Images/components/EmptyImageBanner.vue";
 
 defineProps({
   seller: Object,

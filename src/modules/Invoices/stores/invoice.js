@@ -22,8 +22,6 @@ export const useInvoiceStore = defineStore('invoice', {
             ...invoiceData,
             seller: SellerService.getSellerById(invoiceData.seller.id),
           }));
-
-          console.log(this.invoices);
         })
         .catch((error) => (this.error = error))
         .finally(() => {
@@ -38,7 +36,11 @@ export const useInvoiceStore = defineStore('invoice', {
       await api
         .post(`/invoices`, data)
         .then((response) => {
-          this.user = response.data.payload;
+          this.invoice = response.data;
+          this.invoices.push({
+            ...response.data,
+            seller: SellerService.getSellerById(response.data.seller.id),
+          });
         })
         .catch((error) => {
           this.error = error;
@@ -55,7 +57,7 @@ export const useInvoiceStore = defineStore('invoice', {
       await api
         .delete(`/invoices/${id}`)
         .then((response) => {
-          console.log(response);
+          console.log(response.data);
         })
         .catch((error) => {
           this.error = error;
