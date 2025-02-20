@@ -31,7 +31,7 @@
             Puntuación
           </span>
         <div class="font-size-10 text-red block">
-          <span class="text-primary">Puntos</span> | <span class="text-red">Faltantes</span>
+          <span class="text-primary">Obtenidos</span> | <span class="text-red">Faltantes</span>
         </div>
       </div>
     </q-item-label>
@@ -41,12 +41,9 @@
       <SpinnerLoading  />
     </div>
 
-    <BannerComponent
-      v-if="isEmptySellers && !loading"
-      color="accent"
-      textValue="No hay vendedores para mostrar"
-      @refresh="handleFetchSellers"
-    />
+    <div v-show="isEmptySellers && !loading" class="q-ma-lg">
+      <EmptyBanner  text-value="No hay vendedores para mostrar" />
+    </div>
 
     <div v-if="!loading">
       <div
@@ -105,11 +102,13 @@ import BadgeComponent from "src/modules/shared/components/BadgeComponent.vue";
 import SellerService from "src/modules/Sellers/services/SellerService.js";
 import GenericButton from "src/modules/shared/components/GenericButton.vue";
 import SellerDialog from "src/modules/Sellers/components/SellerDialog.vue";
-import BannerComponent from "src/modules/shared/components/BannerComponent.vue";
 import SearchSellerService from "src/modules/Sellers/services/SearchSellerService.js";
-import InvoiceService from "src/modules/Invoices/services/InvoiceService.js";
 import {useSuccessNotification} from "src/modules/shared/services/successNotification.js";
 import TextInput from "src/modules/shared/components/TextInput.vue";
+import CleanerService from "src/modules/shared/services/CleanerService.js";
+import EmptyBanner from "src/modules/shared/components/EmptyBanner.vue";
+import InputValidationService from "src/modules/Images/services/InputValidationService.js";
+import CreatorInvoiceService from "src/modules/Invoices/services/CreatorInvoiceService.js";
 
 const { winner, error, loading } = storeToRefs(useSellerStore());
 
@@ -130,6 +129,13 @@ onMounted(() => {
   }
 });
 
+/**
+ * Get the sellers
+ * After adding sellers to the store from the API
+ * A copy is made so as not to affect the store data
+ *
+ * @returns {Promise<void>}
+ */
 const handleFetchSellers = () => {
   SearchSellerService.fetchSellers().then(() => {
     if (error.value) {
@@ -140,6 +146,11 @@ const handleFetchSellers = () => {
   });
 };
 
+/**
+ * Calculate missing points
+ * @param score
+ * @returns {number|*}
+ */
 const missingPoint = (score) => {
   return SellerService.getMissingScore(score);
 };
@@ -154,14 +165,22 @@ const handleCancelDialog = () => {
   showSellerDialog.value = false;
 }
 
+/**
+ * Generate invoice
+ * If there is a winner, the invoice is generated
+ * After generating the invoice, the data is cleaned
+ *
+ * @returns {Promise<void>}
+ */
 const handleGenerateInvoice = () => {
   loadingInvoice.value = true;
   if(existWinner.value){
-    InvoiceService.createInvoice().then(() => {
+    CreatorInvoiceService.createInvoice().then(() => {
       if (error.value) {
         errorNotification.notifyError(error.value);
       }else{
         successNotification.notifySuccess("Factura generada correctamente");
+        CleanerService.clearData();
       }
     }).finally(() => {
       loadingInvoice.value = false;
@@ -174,7 +193,7 @@ const handleSearchSeller = () => {
 };
 
 watch(query, (newVal) => {
-  if (newVal.length === 0 || newVal === '') {
+  if (InputValidationService.isEmptyOrWhitespace(newVal)) {
     sellerList.value = SearchSellerService.getStoreSellers();
   }
 });

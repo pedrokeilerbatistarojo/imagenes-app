@@ -32,6 +32,11 @@ export const useSellerStore = defineStore('seller', {
         });
     },
     updateScore(sellerId, points) {
+      if(this.winner) {
+        console.error("Ya hay un ganador");
+        return false;
+      }
+
       const seller = this.sellers.find(s => s.id === sellerId);
       if (seller) {
         seller.score += points;
@@ -40,9 +45,18 @@ export const useSellerStore = defineStore('seller', {
         if (seller.isWinner) {
           this.winner = seller;
         }
+
+        return true;
       } else {
         console.error(`Seller con id ${sellerId} no encontrado`);
       }
-    }
+    },
+    clearScores() {
+      this.sellers.forEach(seller => {
+        seller.score = 0;
+        seller.isWinner = false;
+      });
+      this.winner = null;
+    },
   }
 });

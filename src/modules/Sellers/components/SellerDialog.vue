@@ -20,7 +20,7 @@
                 <div class="text-weight-bold">
                   <span>Puntos: </span>
                   <BadgeComponent class="q-mx-sm" :textValue="seller.score" />
-                  <BadgeComponent color="red" :textValue="seller.score" />
+                  <BadgeComponent color="red" :textValue="missingPoint(seller.score)" />
                 </div>
               </q-item-label>
             </q-item-section>
@@ -39,13 +39,13 @@
             <q-img :src="image.urls.small" :alt="image.alt_description" fit="cover" style="height: 100px" />
           </q-card>
         </div>
-        <EmptyImageBanner v-else />
+        <EmptyBanner v-else text-value="No hay imágenes para mostrar" />
       </q-card-section>
 
       <q-separator />
 
-      <q-card-actions align="right">
-        <q-btn @click="handleCancel" flat color="primary" label="Cerrar" />
+      <q-card-actions class="q-mt-sm" align="right">
+        <q-btn @click="handleCancel" color="primary" label="Cerrar" />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -53,7 +53,8 @@
 
 <script setup>
 import BadgeComponent from "src/modules/shared/components/BadgeComponent.vue";
-import EmptyImageBanner from "src/modules/Images/components/EmptyImageBanner.vue";
+import SellerService from "src/modules/Sellers/services/SellerService.js";
+import EmptyBanner from "src/modules/shared/components/EmptyBanner.vue";
 
 defineProps({
   seller: Object,
@@ -62,6 +63,10 @@ defineProps({
 const emit  = defineEmits([
   'cancel',
 ]);
+
+const missingPoint = (score) => {
+  return SellerService.getMissingScore(score);
+};
 
 const handleCancel = () => emit('cancel');
 

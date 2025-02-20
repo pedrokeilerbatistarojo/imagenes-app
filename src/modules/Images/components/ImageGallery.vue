@@ -38,7 +38,7 @@
           <q-img :src="image.urls.small" :alt="image.alt_description" fit="cover" style="height: 200px" />
         </q-card>
       </div>
-      <EmptyImageBanner v-show="empty" />
+      <EmptyBanner v-show="empty" text-value="No hay imágenes para mostrar" />
     </div>
   </div>
 </template>
@@ -56,7 +56,7 @@ import configImages from "src/modules/Images/config/configImages.js";
 import {useErrorNotification} from "src/modules/shared/services/errorNotificaction.js";
 import SearchSellerService from "src/modules/Sellers/services/SearchSellerService.js";
 import SellerService from "src/modules/Sellers/services/SellerService.js";
-import EmptyImageBanner from "src/modules/Images/components/EmptyImageBanner.vue";
+import EmptyBanner from "src/modules/shared/components/EmptyBanner.vue";
 
 const { loading, images } = storeToRefs(useGalleryStore());
 
@@ -67,14 +67,14 @@ const successNotification = useSuccessNotification();
 const errorNotification = useErrorNotification();
 const empty = computed(() => images.value.length === 0 && !loading.value);
 
-const handleSearchImages = async() => {
-  try {
-    await serviceContainer.searchService.searchImages(query.value, page, perPage);
-  } catch (error) {
-    errorNotification.notifyError(error);
-  }
-};
-
+/**
+ * Method to search for images
+ * If the search field is empty, the search is not performed
+ * If there are no sellers, the search for sellers is performed first
+ * Then the image search method is called through the service container
+ *
+ * @returns {Promise<void>}
+ */
 const fetchImagesData = async () => {
   if (InputValidationService.isEmptyOrWhitespace(query.value)) {
     return;
@@ -88,22 +88,50 @@ const fetchImagesData = async () => {
   }
 };
 
+/**
+ * Calls the service container to instantiate the image search service
+ * Decoupling the dependency on a specific service.
+ *
+ * @returns {Promise<void>}
+ */
+const handleSearchImages = async() => {
+  try {
+    await serviceContainer.searchService.searchImages(query.value, page, perPage);
+  } catch (error) {
+    errorNotification.notifyError(error);
+  }
+};
+
 const lengthDescription = configImages.descriptionLength;
 const sliceStr = (textDescription) => textDescription.slice(0, lengthDescription);
 
+/**
+ *
+ * Select or deselect an image
+ * Depending on the seller, points will be added or subtracted
+ * Then it is validated if there is a winner
+ * If there is not, the image is scored and marked as selected
+ * otherwise, an alert is displayed that the race has ended
+ *
+ * @param {number} id
+ * @returns {Promise<void>}
+ */
+
 const handleSelectPicture = (id) => {
   const index = images.value.findIndex((image) => image.id === id);
-  images.value[index].selected = !images.value[index].selected;
+  const isSelected = !images.value[index].selected;
+  const points = isSelected ? configImages.pointsPerImage : -configImages.pointsPerImage;
   const sellerSelected =  SearchSellerService.getSellerByImageId(id);
 
-  if (images.value[index].selected) {
-    SellerService.setScore(sellerSelected.id, configImages.pointsPerImage);
-  }else{
-    SellerService.setScore(sellerSelected.id, -configImages.pointsPerImage);
-  }
+  if(SellerService.setScore(sellerSelected.id, points)){
+    images.value[index].selected = isSelected;
 
-  if  (sellerSelected.isWinner) {
-    successNotification.notifySuccess(`El vendedor ${sellerSelected.name} ha alcanzado ${sellerSelected.score} puntos`);
+    if  (sellerSelected.isWinner) {
+      successNotification.notifySuccess(`El vendedor ${sellerSelected.name} ha alcanzado ${sellerSelected.score} puntos`);
+    }
+
+  }else{
+    errorNotification.notifyError('La carrera ha finalizado');
   }
 };
 

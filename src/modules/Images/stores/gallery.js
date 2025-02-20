@@ -7,5 +7,8 @@ export const useGalleryStore = defineStore('gallery', {
     error: null,
   }),
   actions: {
+    clearImages(){
+      this.images = [];
+    }
   }
 });

@@ -1,29 +1,31 @@
 <template>
   <q-dialog>
-    <q-card class="my-card q-pa-md" style="width: 700px; max-width: 80vw;">
+    <q-card class="my-card q-pa-md" style="width: 600px; max-width: 95vw;">
       <q-card-section>
         <q-list bordered class="rounded-borders">
-          <q-item>
+          <q-item class="">
             <q-item-section avatar>
               <q-avatar>
-                <img :src="invoice.seller.avatar" :alt="invoice.seller.name">
+                <img :src=invoice.seller.avatar alt="avatar">
               </q-avatar>
             </q-item-section>
-
             <q-item-section>
-              <q-item-label class="lexend" lines="1">
-                {{ invoice.seller.name }}
-              </q-item-label>
-              <q-item-label caption lines="1">
-                <span>{{ invoice.seller.observations }}</span>
-              </q-item-label>
               <q-item-label lines="1">
-                <span class="font-size-12 q-mt-sm block"><b>Fecha:</b> {{invoice.datetime}}</span>
-              </q-item-label>
-              <q-item-label lines="1">
-                <div class="text-weight-bold">
-                  <span class="font-size-12">Puntos: </span>
-                  <BadgeComponent class="q-mx-sm" :textValue="invoiceService.getScoreWinner(invoice.id)" />
+                <div class="flex justify-between">
+                  <div>
+                    <span class="fw-bold block lexend">{{ invoice.seller.name }}</span>
+                    <span class="text-subtitle">{{ invoice.seller.observations }}</span>
+                  </div>
+                  <div>
+                    <div>
+                      <span class="text-subtitle"> Fecha: </span>
+                      <span class="fw-bold"> {{invoice.date}}</span>
+                    </div>
+                    <div>
+                      <span class="text-subtitle">Puntos totales: </span>
+                      <BadgeComponent class="q-mx-sm fw-bold" :textValue="getTotalScore(invoice.id)" />
+                    </div>
+                  </div>
                 </div>
               </q-item-label>
             </q-item-section>
@@ -32,14 +34,14 @@
 
       </q-card-section>
 
-      <q-card-section class="q-pt-none">
-        <InvoiceSellerList :sellers="getStorageSellers(invoice.id)" />
+      <q-card-section v-if="sellers.length > 0" class="q-pt-none">
+        <InvoiceSellerList :sellers="sellers" />
       </q-card-section>
 
       <q-separator />
 
-      <q-card-actions align="right">
-        <q-btn @click="handleCancel" flat color="primary" label="Cerrar" />
+      <q-card-actions class="q-mt-sm" align="right">
+        <q-btn @click="handleCancel" color="primary" label="Cerrar" />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -47,11 +49,13 @@
 
 <script setup>
 import BadgeComponent from "src/modules/shared/components/BadgeComponent.vue";
-import invoiceService from "src/modules/Invoices/services/InvoiceService.js";
 import InvoiceSellerList from "src/modules/Invoices/components/InvoiceSellerList.vue";
 import InvoiceService from "src/modules/Invoices/services/InvoiceService.js";
+import ScoreService from "src/modules/Invoices/services/ScoreService.js";
+import SearchInvoiceService from "src/modules/Invoices/services/SearchInvoiceService.js";
+import { computed } from "vue";
 
-defineProps({
+const props = defineProps({
   invoice: Object,
 });
 
@@ -61,9 +65,15 @@ const emit  = defineEmits([
 
 const getStorageSellers = (invoiceId) => {
   const scores = InvoiceService.getItemStorageByInvoiceId(invoiceId);
-  return scores.sellers;
+  return scores ? scores.sellers : [];
 };
 
+const sellers = computed(() => getStorageSellers(props.invoice.id));
+
+const getTotalScore = () => {
+  const invoice = SearchInvoiceService.getStoreInvoiceById(props.invoice.id);
+  return `${invoice ? ScoreService.getTotalScoreByInvoice(invoice.items) : 0}`;
+};
 
 const handleCancel = () => emit('cancel');
 

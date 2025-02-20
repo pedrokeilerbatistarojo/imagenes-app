@@ -51,7 +51,7 @@ export default {
   },
   setScore(sellerId, points){
     const sellerStore = useSellerStore();
-    sellerStore.updateScore(sellerId, points);
+    return sellerStore.updateScore(sellerId, points);
   },
   getMissingScore(score){
     if (score >= configImages.winnerPoints) return 0;

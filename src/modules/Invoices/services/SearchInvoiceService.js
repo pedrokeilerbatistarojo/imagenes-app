@@ -11,6 +11,8 @@ export default{
   },
   async fetchInvoices(){
     const invoiceStore = useInvoiceStore();
-    return await invoiceStore.fetchInvoices();
+    return await invoiceStore.fetchInvoices({
+      order_direction: 'ASC'
+    });
   },
 }

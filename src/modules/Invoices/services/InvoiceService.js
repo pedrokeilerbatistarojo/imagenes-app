@@ -1,38 +1,12 @@
 import {useInvoiceStore} from "src/modules/Invoices/stores/invoice.js";
-import fakerDataService from "src/modules/Invoices/services/FakerDataService.js";
-import FormatService from "src/modules/shared/services/FormatService.js";
-import {useSellerStore} from "src/modules/Sellers/stores/seller.js";
 import LocalStorageService from "src/modules/shared/services/LocalStorageService.js";
-import { SimplifiedSeller } from "src/modules/Sellers/models/SimplifiedSeller.js";
 
 export default {
-  async createInvoice() {
-    const invoiceStore = useInvoiceStore();
-    const sellerStore = useSellerStore();
-    const winner = sellerStore.winner;
-
-    if (!winner) {
-      throw new Error('No hay ganador');
-    }
-
-    const winnerModel = SimplifiedSeller(winner);
-    const sellers = sellerStore.sellers.map(seller => SimplifiedSeller(seller));
-
-    const data = fakerDataService.getData();
-    data.date = FormatService.formatDateNowShort();
-    data.dueDate = FormatService.formatDateNowShort();
-    data.datetime = FormatService.formatDateTimeNow();
-    data.seller = winnerModel.id;
-
-    LocalStorageService.addToArray("scores", {
-      id: winnerModel.id,
-      winner: winnerModel,
-      sellers: sellers,
-      datetime: FormatService.formatDateTimeNow()
-    });
-
-    return await invoiceStore.storeInvoice(data);
-  },
+  /**
+   * Delete the invoice by id and Delete assiciate score in the locaStorage
+   * @param invoiceId
+   * @returns {Promise<void>}
+   */
   async deleteInvoice(invoiceId) {
     const invoiceStore = useInvoiceStore();
     let scoresHistory = LocalStorageService.getItem("scores") || [];
@@ -55,8 +29,4 @@ export default {
 
     return null;
   },
-  getScoreWinner(invoiceId) {
-    const scores = this.getItemStorageByInvoiceId(invoiceId);
-    return `${scores ? scores.winner.score : 0}`;
-  }
 };

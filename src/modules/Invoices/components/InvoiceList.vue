@@ -11,12 +11,9 @@
         <SpinnerLoading  />
       </div>
 
-      <BannerComponent
-        v-if="isEmptyInvoices && !loading"
-        color="accent"
-        textValue="No hay facturas para mostrar"
-        @refresh="handleFetchInvoices"
-      />
+      <div v-show="isEmptyInvoices && !loading" class="q-ma-lg">
+        <EmptyBanner text-value="No hay facturas para mostrar" />
+      </div>
 
       <div v-if="!loading">
         <div
@@ -38,13 +35,12 @@
                 <span class="font-size-12">{{invoice.datetime.split(" ")[0]}}</span>
                 <span class="font-size-12">{{invoice.datetime.split(" ")[1]}}</span>
                 <div class="q-my-sm">
-                  <BadgeComponent :textValue="getScoreWinner(invoice.id)" /> Puntos
+                  <BadgeComponent :textValue="getTotalScore(invoice.id)" /> Puntos Totales
                 </div>
               </q-item-label>
             </q-item-section>
             <q-item-section side>
               <div class="text-grey-8 q-gutter-xs flex items-center">
-
                 <q-btn
                   @click="handleViewDetails(invoice.id)"
                   size="12px"
@@ -88,9 +84,7 @@ import { computed, onMounted, ref } from "vue";
 import { storeToRefs } from "pinia";
 import SpinnerLoading from "src/modules/shared/components/SpinnerLoading.vue";
 import { useErrorNotification } from "src/modules/shared/services/errorNotificaction.js";
-import BannerComponent from "src/modules/shared/components/BannerComponent.vue";
 import invoiceService from "src/modules/Invoices/services/InvoiceService.js";
-import InvoiceService from "src/modules/Invoices/services/InvoiceService.js";
 import { useSuccessNotification } from "src/modules/shared/services/successNotification.js";
 import { useQuasar } from "quasar";
 import BadgeComponent from "src/modules/shared/components/BadgeComponent.vue";
@@ -98,6 +92,8 @@ import SearchSellerService from "src/modules/Sellers/services/SearchSellerServic
 import SearchInvoiceService from "src/modules/Invoices/services/SearchInvoiceService.js";
 import { useInvoiceStore } from "src/modules/Invoices/stores/invoice.js";
 import InvoiceDialog from "src/modules/Invoices/components/InvoiceDialog.vue";
+import ScoreService from "src/modules/Invoices/services/ScoreService.js";
+import EmptyBanner from "src/modules/shared/components/EmptyBanner.vue";
 
 const { error, loading } = storeToRefs(useInvoiceStore());
 
@@ -121,8 +117,15 @@ onMounted(() => {
   }
 });
 
+/**
+ * Computed property that checks if the invoice list is empty
+ * @type {ComputedRef<boolean>}
+ */
 const isEmptyInvoices = computed(() => invoiceList.value.length === 0);
 
+/**
+ * Method that fetches the invoices from the store
+ */
 const handleFetchInvoices = async () => {
   await SearchInvoiceService.fetchInvoices().then(() => {
     if (error.value) {
@@ -133,11 +136,21 @@ const handleFetchInvoices = async () => {
   });
 };
 
-const getScoreWinner = (invoiceId) => {
-  const scores = InvoiceService.getItemStorageByInvoiceId(invoiceId);
-  return `${scores ? scores.winner.score : 0}`;
+/**
+ * Method that returns the total score of an invoice
+ * @param invoiceId
+ * @returns {"0"}
+ */
+const getTotalScore = (invoiceId) => {
+  const invoice = SearchInvoiceService.getStoreInvoiceById(invoiceId);
+  return `${invoice ? ScoreService.getTotalScoreByInvoice(invoice.items) : 0}`;
 };
 
+
+/**
+ * Method that handles the view details of an invoice
+ * @param id
+ */
 const handleViewDetails = (id) => {
   invoiceSelected.value = SearchInvoiceService.getStoreInvoiceById(id);
   if (invoiceSelected.value){
@@ -147,6 +160,10 @@ const handleViewDetails = (id) => {
   }
 };
 
+/**
+ * Method that handles the deleting of an invoice
+ * @param id
+ */
 const handleDelete = (id) => {
   $q.dialog({
     title: 'Eliminar factura',
