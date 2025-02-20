@@ -39,7 +39,7 @@
         </q-card>
       </div>
       <div v-if="empty" class="flex flex-center">
-         <span>
+         <span class="bg-gray-2 q-pa-md">
            <q-icon name="sentiment_very_dissatisfied" /> No hay imágenes para mostrar
          </span>
       </div>
@@ -68,18 +68,26 @@ const { perPage, page } = configImages;
 
 const successNotification = useSuccessNotification();
 const errorNotification = useErrorNotification();
-
 const empty = computed(() => images.value.length === 0 && query.value !== '');
+
+const handleSearchImages = async() => {
+  try {
+    await serviceContainer.searchService.searchImages(query.value, page, perPage);
+  } catch (error) {
+    errorNotification.notifyError(error);
+  }
+};
 
 const fetchImagesData = async () => {
   if (InputValidationService.isEmptyOrWhitespace(query.value)) {
     return;
   }
 
-  try {
-    await serviceContainer.searchService.searchImages(query.value, page, perPage);
-  } catch (error) {
-    errorNotification.notifyError(error);
+  if(SearchSellerService.countSellers() === 0){
+    loading.value = true;
+    SearchSellerService.fetchSellers().then(() => handleSearchImages());
+  }else{
+    await handleSearchImages();
   }
 };
 

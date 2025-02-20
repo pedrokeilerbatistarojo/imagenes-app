@@ -57,16 +57,22 @@ import EssentialLink from 'src/modules/shared/components/EssentialLink.vue'
 
 const linksList = [
   {
-    title: 'Vendedores',
-    caption: 'Información General',
-    icon: 'group',
-    link: { name: 'home' }
-  },
-  {
     title: 'Imágenes',
     caption: 'Buscar Imágenes',
     icon: 'search',
     link: { name: 'images' }
+  },
+  {
+    title: 'Vendedores',
+    caption: 'Información General',
+    icon: 'group',
+    link: { name: 'sellers' }
+  },
+  {
+    title: 'Facturas',
+    caption: 'Lista de facturas',
+    icon: 'description',
+    link: { name: 'invoices' }
   },
 ]
 

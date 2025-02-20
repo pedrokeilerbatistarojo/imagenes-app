@@ -1,8 +1,8 @@
 <template>
   <q-input
-    bottom-slots
+    :bottom-slots="bottomSlots"
     v-model="textValue"
-    counter
+    :counter="counter"
     dense
     rounded
     outlined
@@ -30,7 +30,15 @@ const props = defineProps({
   maxSpaces: {
     type: Number,
     default: 60
-  }
+  },
+  counter: {
+    type: Boolean,
+    default: true
+  },
+  bottomSlots: {
+    type: Boolean,
+    default: true
+  },
 });
 
 const emit = defineEmits(['update:modelValue']);

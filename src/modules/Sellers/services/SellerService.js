@@ -1,12 +1,14 @@
 import {useSellerStore} from "src/modules/Sellers/stores/seller.js";
 import {Image} from "src/modules/Images/models/Image.js";
 import configImages from "src/modules/Images/config/configImages.js";
+import UtilService from "src/modules/shared/services/UtilService.js";
 
 export default {
   assignImagesToSellers(images) {
     let result = images;
     const sellerStore = useSellerStore();
-    const sellerCount = sellerStore.sellers.length;
+    let sellers = sellerStore.sellers;
+    const sellerCount = sellers.length;
     const totalImages = images.length;
     const remainder = totalImages % sellerCount;
 
@@ -18,9 +20,11 @@ export default {
 
     const imagesPerSeller = result.length / sellerCount;
 
-    const imagesWithSeller = [];
+    let imagesWithSeller = [];
 
-    sellerStore.sellers.forEach((seller, index) => {
+    sellers = UtilService.unsortItems(sellers);
+
+    sellers.forEach((seller, index) => {
       const start = index * imagesPerSeller;
       const end = start + imagesPerSeller;
       seller.images = result.slice(start, end);
@@ -33,12 +37,13 @@ export default {
       });
     });
 
-    for (let i = imagesWithSeller.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [imagesWithSeller[i], imagesWithSeller[j]] = [imagesWithSeller[j], imagesWithSeller[i]];
-    }
+    imagesWithSeller = UtilService.unsortItems(imagesWithSeller);
 
     return imagesWithSeller;
+  },
+  getSellerById(sellerId) {
+    const sellerStore = useSellerStore();
+    return sellerStore.sellers.find(s => s.id === sellerId);
   },
   getAvatarUrl()  {
     const randomId = Math.floor(Math.random() * 6) + 1;
@@ -51,5 +56,8 @@ export default {
   getMissingScore(score){
     if (score >= configImages.winnerPoints) return 0;
     return configImages.winnerPoints - score;
+  },
+  sortSellersByScore(sellers){
+    return sellers.sort((a, b) => b.score - a.score);
   }
 };

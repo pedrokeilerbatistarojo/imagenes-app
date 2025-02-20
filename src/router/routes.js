@@ -9,9 +9,19 @@ const routes = [
         component: () => import('src/modules/shared/pages/IndexPage.vue')
       },
       {
+        name:'sellers',
+        path: '/sellers',
+        component: () => import('../modules/Sellers/pages/IndexPage.vue')
+      },
+      {
         name:'images',
         path: '/images',
         component: () => import('../modules/Images/pages/IndexPage.vue')
+      },
+      {
+        name:'invoices',
+        path: '/invoices',
+        component: () => import('../modules/Invoices/pages/IndexPage.vue')
       }
     ]
   },

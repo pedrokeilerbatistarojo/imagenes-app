@@ -1,8 +1,8 @@
 {
   "name": "imagenes-app",
   "version": "0.0.1",
-  "description": "Imagenes por el mundo App - Alegra Vue Test",
-  "productName": "Imagenes por el mundo App",
+  "description": "Imagenes del mundo App - Alegra Vue Test",
+  "productName": "Imagenes del mundo",
   "author": "laravel777crew <pedro@777crew.com>",
   "type": "module",
   "private": true,

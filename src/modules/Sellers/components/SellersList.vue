@@ -1,11 +1,27 @@
 <template>
   <div class="q-pa-md q-gutter-md">
-    <div class="flex justify-end q-mt-none">
-      <GenericButton
-        label="Generar Factura"
-        :loading="loading"
-        :disable="!existWinner"
-      />
+    <div class="row q-mt-none">
+      <div class="col q-pr-md">
+        <TextInput
+          :bottom-slots="false"
+          :counter="false"
+          bg-color="white"
+          v-model="query"
+          label="Buscar vendedores"
+          outlined
+          class="q-mb-md full-width"
+          @keyup.enter="handleSearchSeller"
+        />
+      </div>
+      <div class="col-12 col-sm-4 col-md-3 col-lg-2">
+        <GenericButton
+          class="float-right full-width"
+          label="Generar Factura"
+          :loading="loading"
+          :disable="!existWinner"
+          @click="handleGenerateInvoice"
+        />
+      </div>
     </div>
     <q-list bordered class="rounded-borders bg-white shadow-soft">
       <q-item-label header class="font-size-16 flex items-center justify-between">
@@ -27,40 +43,49 @@
         <SpinnerLoading  />
       </div>
 
-      <div
-        v-for="seller in sellers"
-        :key="seller.id">
-        <q-item
-          clickable
-          v-ripple
-          @click="handleShow(seller)"
-          :class="{'bg-secondary': seller.isWinner}"
-        >
-          <q-item-section avatar>
-            <q-avatar>
-              <img :src=seller.avatar alt="avatar">
-            </q-avatar>
-          </q-item-section>
+      <BannerComponent
+        v-if="isEmptySellers && !loading"
+        color="accent"
+        textValue="No hay facturas para mostrar"
+        @refresh="handleFetchSellers"
+      />
 
-          <q-item-section>
-            <q-item-label lines="1" class="lexend">{{seller.name}}</q-item-label>
-            <q-item-label caption lines="2">
-              <BadgeComponent class="q-mx-sm" :textValue="seller.status" />
-              {{seller.observations}}
-            </q-item-label>
-          </q-item-section>
-          <q-item-section side>
-            <div class="q-my-sm">
-              <q-btn v-if="seller.isWinner" icon="emoji_events" color="primary" flat class="q-mr-sm">
-                <q-tooltip>Es el ganador</q-tooltip>
-              </q-btn>
-              <BadgeComponent class="q-mx-sm" :textValue="seller.score" />
-              <BadgeComponent class="q-mx-sm" color="red" :textValue="missingPoint(seller.score)" />
-            </div>
-          </q-item-section>
-        </q-item>
+      <div v-if="!loading">
+        <div
+          v-for="seller in sellersSort"
+          :key="seller.id">
+          <q-item
+            clickable
+            v-ripple
+            @click="handleShow(seller)"
+            :class="{'bg-secondary': seller.isWinner}"
+          >
+            <q-item-section avatar>
+              <q-avatar>
+                <img :src=seller.avatar alt="avatar">
+              </q-avatar>
+            </q-item-section>
 
-        <q-separator inset="item" />
+            <q-item-section>
+              <q-item-label lines="1" class="lexend">{{seller.name}}</q-item-label>
+              <q-item-label caption lines="2">
+                <BadgeComponent class="q-mx-sm" :textValue="seller.status" />
+                {{seller.observations}}
+              </q-item-label>
+            </q-item-section>
+            <q-item-section side>
+              <div class="q-my-sm">
+                <q-btn v-if="seller.isWinner" icon="emoji_events" color="primary" flat class="q-mr-sm">
+                  <q-tooltip>Es el ganador</q-tooltip>
+                </q-btn>
+                <BadgeComponent class="q-mx-sm" :textValue="seller.score" />
+                <BadgeComponent class="q-mx-sm" color="red" :textValue="missingPoint(seller.score)" />
+              </div>
+            </q-item-section>
+          </q-item>
+
+          <q-separator inset="item" />
+        </div>
       </div>
     </q-list>
   </div>
@@ -73,7 +98,7 @@
 </template>
 
 <script setup>
-import {computed, onMounted, ref} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import {storeToRefs} from "pinia";
 import {useSellerStore} from "src/modules/Sellers/stores/seller.js";
 import SpinnerLoading from "src/modules/shared/components/SpinnerLoading.vue";
@@ -82,24 +107,37 @@ import BadgeComponent from "src/modules/shared/components/BadgeComponent.vue";
 import SellerService from "src/modules/Sellers/services/SellerService.js";
 import GenericButton from "src/modules/shared/components/GenericButton.vue";
 import SellerDialog from "src/modules/Sellers/components/SellerDialog.vue";
+import BannerComponent from "src/modules/shared/components/BannerComponent.vue";
+import SearchSellerService from "src/modules/Sellers/services/SearchSellerService.js";
+import InvoiceService from "src/modules/Invoices/services/InvoiceService.js";
+import {useSuccessNotification} from "src/modules/shared/services/successNotification.js";
+import TextInput from "src/modules/shared/components/TextInput.vue";
 
-const { sellers, winner, error, loading } = storeToRefs(useSellerStore());
-const { fetchSellers } = useSellerStore();
+const { winner, error, loading } = storeToRefs(useSellerStore());
 
 const errorNotification = useErrorNotification();
+const successNotification = useSuccessNotification();
 const showSellerDialog = ref(false);
 const sellerSelected = ref(null);
+const sellersSort = computed(() => SellerService.sortSellersByScore(sellerList.value));
+const query = ref('');
+const sellerList = ref([]);
 
 onMounted(() => {
   if(isEmptySellers.value){
-    fetchSellers().then(() => {
-      if (error.value) {
-        errorNotification.notifyError(error.value);
-      }
-    });
+    handleFetchSellers();
   }
-
 });
+
+const handleFetchSellers = () => {
+  SearchSellerService.fetchSellers().then(() => {
+    if (error.value) {
+      errorNotification.notifyError(error.value);
+    }else{
+      sellerList.value = SearchSellerService.getStoreSellers();
+    }
+  });
+};
 
 const missingPoint = (score) => {
   return SellerService.getMissingScore(score);
@@ -115,7 +153,29 @@ const handleCancelDialog = () => {
   showSellerDialog.value = false;
 }
 
-const isEmptySellers = computed(() => sellers.value.length === 0);
+const handleGenerateInvoice = () => {
+  if(existWinner.value){
+    InvoiceService.createInvoice().then(() => {
+      if (error.value) {
+        errorNotification.notifyError(error.value);
+      }else{
+        successNotification.notifySuccess("Factura generada correctamente");
+      }
+    });
+  }
+};
+
+const handleSearchSeller = () => {
+  sellerList.value = SearchSellerService.getSellerByName(query.value);
+};
+
+watch(query, (newVal) => {
+  if (newVal.length === 0 || newVal === '') {
+    sellerList.value = SearchSellerService.getStoreSellers();
+  }
+});
+
+const isEmptySellers = computed(() => sellerList.value.length === 0);
 
 const existWinner = computed(() => winner.value !== null);
 

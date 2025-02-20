@@ -1,9 +1,9 @@
 <template>
   <q-page class="q-pa-md">
-    <SellersList />
+    <ImageGallery />
   </q-page>
 </template>
 
 <script setup>
-import SellersList from "src/modules/Sellers/components/SellersList.vue";
+import ImageGallery from "src/modules/Images/components/ImageGallery.vue";
 </script>
