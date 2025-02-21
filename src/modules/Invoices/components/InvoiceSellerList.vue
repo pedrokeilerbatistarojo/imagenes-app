@@ -9,6 +9,7 @@
       :key="seller.id"
     >
       <q-item
+        class="q-py-none"
         v-ripple
       >
         <q-item-section>

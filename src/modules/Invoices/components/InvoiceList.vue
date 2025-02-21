@@ -11,9 +11,9 @@
         <SpinnerLoading  />
       </div>
 
-      <div v-show="isEmptyInvoices && !loading" class="q-ma-lg">
+      <q-intersection transition="scale" v-show="isEmptyInvoices && !loading" class="q-ma-lg">
         <EmptyBanner text-value="No hay facturas para mostrar" />
-      </div>
+      </q-intersection>
 
       <div v-if="!loading">
         <div
@@ -83,9 +83,9 @@
 import { computed, onMounted, ref } from "vue";
 import { storeToRefs } from "pinia";
 import SpinnerLoading from "src/modules/shared/components/SpinnerLoading.vue";
-import { useErrorNotification } from "src/modules/shared/services/errorNotificaction.js";
+import { useErrorNotification } from "src/modules/shared/composables/errorNotificaction.js";
 import invoiceService from "src/modules/Invoices/services/InvoiceService.js";
-import { useSuccessNotification } from "src/modules/shared/services/successNotification.js";
+import { useSuccessNotification } from "src/modules/shared/composables/successNotification.js";
 import { useQuasar } from "quasar";
 import BadgeComponent from "src/modules/shared/components/BadgeComponent.vue";
 import SearchSellerService from "src/modules/Sellers/services/SearchSellerService.js";

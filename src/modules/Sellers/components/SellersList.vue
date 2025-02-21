@@ -21,6 +21,7 @@
       />
     </div>
   </div>
+
   <q-list bordered class="rounded-borders bg-white shadow-soft q-mt-md">
     <q-item-label header class="font-size-16 flex items-center justify-between">
       <div class="lexend">
@@ -41,11 +42,14 @@
       <SpinnerLoading  />
     </div>
 
-    <div v-show="isEmptySellers && !loading" class="q-ma-lg">
-      <EmptyBanner  text-value="No hay vendedores para mostrar" />
-    </div>
+    <q-intersection transition="scale">
+      <EmptyBanner v-show="isEmptySellers && !loading" class="q-ma-lg"  text-value="No hay vendedores para mostrar" />
+    </q-intersection>
 
-    <div v-if="!loading">
+    <transition-group
+      tag="div"
+      v-if="!loading"
+    >
       <div
         v-for="seller in sellersSort"
         :key="seller.id">
@@ -82,7 +86,7 @@
 
         <q-separator inset="item" />
       </div>
-    </div>
+    </transition-group>
   </q-list>
 
   <SellerDialog
@@ -97,18 +101,18 @@ import {computed, onMounted, ref, watch} from "vue";
 import {storeToRefs} from "pinia";
 import {useSellerStore} from "src/modules/Sellers/stores/seller.js";
 import SpinnerLoading from "src/modules/shared/components/SpinnerLoading.vue";
-import {useErrorNotification} from "src/modules/shared/services/errorNotificaction.js";
+import {useErrorNotification} from "src/modules/shared/composables/errorNotificaction.js";
 import BadgeComponent from "src/modules/shared/components/BadgeComponent.vue";
 import SellerService from "src/modules/Sellers/services/SellerService.js";
 import GenericButton from "src/modules/shared/components/GenericButton.vue";
 import SellerDialog from "src/modules/Sellers/components/SellerDialog.vue";
 import SearchSellerService from "src/modules/Sellers/services/SearchSellerService.js";
-import {useSuccessNotification} from "src/modules/shared/services/successNotification.js";
+import {useSuccessNotification} from "src/modules/shared/composables/successNotification.js";
 import TextInput from "src/modules/shared/components/TextInput.vue";
-import CleanerService from "src/modules/shared/services/CleanerService.js";
 import EmptyBanner from "src/modules/shared/components/EmptyBanner.vue";
 import InputValidationService from "src/modules/Images/services/InputValidationService.js";
 import CreatorInvoiceService from "src/modules/Invoices/services/CreatorInvoiceService.js";
+import { useDataCleaner } from "src/modules/shared/composables/Cleaner.js";
 
 const { winner, error, loading } = storeToRefs(useSellerStore());
 
@@ -180,7 +184,8 @@ const handleGenerateInvoice = () => {
         errorNotification.notifyError(error.value);
       }else{
         successNotification.notifySuccess("Factura generada correctamente");
-        CleanerService.clearData();
+        const cleaner = useDataCleaner();
+        cleaner.clearData();
       }
     }).finally(() => {
       loadingInvoice.value = false;

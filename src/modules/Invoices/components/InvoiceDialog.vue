@@ -17,11 +17,11 @@
                     <span class="text-subtitle">{{ invoice.seller.observations }}</span>
                   </div>
                   <div>
-                    <div>
+                    <div class="flex justify-between">
                       <span class="text-subtitle"> Fecha: </span>
                       <span class="fw-bold"> {{invoice.date}}</span>
                     </div>
-                    <div>
+                    <div class="flex justify-between">
                       <span class="text-subtitle">Puntos totales: </span>
                       <BadgeComponent class="q-mx-sm fw-bold" :textValue="getTotalScore(invoice.id)" />
                     </div>

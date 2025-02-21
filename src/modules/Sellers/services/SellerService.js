@@ -45,9 +45,10 @@ export default {
     const sellerStore = useSellerStore();
     return sellerStore.sellers.find(s => s.id === sellerId);
   },
-  getAvatarUrl()  {
-    const randomId = Math.floor(Math.random() * 6) + 1;
-    return `https://cdn.quasar.dev/img/avatar${randomId}.jpg`;
+  getAvatarUrl(id = null)  {
+    const maxId = 6;
+    const avatarId = id <= maxId ? id: Math.floor(Math.random() * 6) + 1;
+    return `https://cdn.quasar.dev/img/avatar${avatarId}.jpg`;
   },
   setScore(sellerId, points){
     const sellerStore = useSellerStore();

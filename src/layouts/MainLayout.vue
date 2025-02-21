@@ -27,6 +27,8 @@
       v-model="leftDrawerOpen"
       show-if-above
       bordered
+      :width="200"
+      :breakpoint="500"
     >
       <q-list>
         <q-item-label
@@ -64,20 +66,19 @@ const linksList = [
   },
   {
     title: 'Vendedores',
-    caption: 'Información General',
+    caption: 'Listar vendedores',
     icon: 'group',
     link: { name: 'sellers' }
   },
   {
     title: 'Facturas',
-    caption: 'Lista de facturas',
+    caption: 'Listar facturas',
     icon: 'description',
     link: { name: 'invoices' }
   },
 ]
 
 const leftDrawerOpen = ref(true);
-
 const toggleLeftDrawer = () => leftDrawerOpen.value = !leftDrawerOpen.value
 </script>
 

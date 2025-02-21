@@ -9,10 +9,16 @@
         class="q-mb-md"
         @keyup.enter="fetchImagesData"
       />
-      <SpinnerLoading v-if="loading" />
-      <div v-else class="image-grid">
-        <q-card v-for="image in images" :key="image.id" class="my-card" flat bordered>
-          <q-item>
+
+      <SpinnerLoading v-show="loading" />
+
+      <transition-group
+        tag="div"
+        class="image-grid"
+        v-if="!loading"
+      >
+        <q-card v-for="image in images" :key="image.id" flat bordered>
+          <q-item class="q-pa-sm">
             <q-item-section avatar>
               <q-avatar>
                 <img :src=image.seller.avatar alt="avatar">
@@ -21,24 +27,30 @@
 
             <q-item-section>
               <q-item-label>{{image.seller.name}}</q-item-label>
-              <q-item-label caption>{{sliceStr(image.alt_description)}}...</q-item-label>
+              <q-item-label class="font-size-10" caption>{{sliceStr(image.alt_description)}}...</q-item-label>
             </q-item-section>
 
-            <q-card-actions align="right">
+            <q-card-actions class="q-pa-none" align="right">
               <q-btn
                 flat
                 round
                 :color="image.selected ? `primary` : `red`"
                 :icon="image.selected ? `thumb_up` :`favorite`"
                 @click="handleSelectPicture(image.id)"
-              />
+              >
+                <q-tooltip>Seleccionar imagen</q-tooltip>
+              </q-btn>
             </q-card-actions>
           </q-item>
 
           <q-img :src="image.urls.small" :alt="image.alt_description" fit="cover" style="height: 200px" />
         </q-card>
-      </div>
-      <EmptyBanner v-show="empty" text-value="No hay imágenes para mostrar" />
+      </transition-group>
+
+      <q-intersection transition="scale">
+        <EmptyBanner v-show="empty" text-value="No hay imágenes para mostrar" />
+      </q-intersection>
+
     </div>
   </div>
 </template>
@@ -51,17 +63,20 @@ import {storeToRefs} from "pinia";
 import {useGalleryStore} from "src/modules/Images/stores/gallery.js";
 import SpinnerLoading from "src/modules/shared/components/SpinnerLoading.vue";
 import InputValidationService from "src/modules/Images/services/InputValidationService.js";
-import {useSuccessNotification} from "src/modules/shared/services/successNotification.js";
+import {useSuccessNotification} from "src/modules/shared/composables/successNotification.js";
 import configImages from "src/modules/Images/config/configImages.js";
-import {useErrorNotification} from "src/modules/shared/services/errorNotificaction.js";
+import {useErrorNotification} from "src/modules/shared/composables/errorNotificaction.js";
 import SearchSellerService from "src/modules/Sellers/services/SearchSellerService.js";
 import SellerService from "src/modules/Sellers/services/SellerService.js";
 import EmptyBanner from "src/modules/shared/components/EmptyBanner.vue";
+import { useDataCleaner } from "src/modules/shared/composables/Cleaner.js";
 
 const { loading, images } = storeToRefs(useGalleryStore());
 
 const query = ref('');
-const { perPage, page } = configImages;
+const { page } = configImages;
+
+const perPage = computed(() => SearchSellerService.countSellers());
 
 const successNotification = useSuccessNotification();
 const errorNotification = useErrorNotification();
@@ -82,7 +97,7 @@ const fetchImagesData = async () => {
 
   if(SearchSellerService.countSellers() === 0){
     loading.value = true;
-    SearchSellerService.fetchSellers().then(() => handleSearchImages());
+    SearchSellerService.fetchSellers().then(async () => await handleSearchImages());
   }else{
     await handleSearchImages();
   }
@@ -96,7 +111,7 @@ const fetchImagesData = async () => {
  */
 const handleSearchImages = async() => {
   try {
-    await serviceContainer.searchService.searchImages(query.value, page, perPage);
+    await serviceContainer.searchService.searchImages(query.value, page, perPage.value);
   } catch (error) {
     errorNotification.notifyError(error);
   }
@@ -126,9 +141,15 @@ const handleSelectPicture = (id) => {
   if(SellerService.setScore(sellerSelected.id, points)){
     images.value[index].selected = isSelected;
 
-    if  (sellerSelected.isWinner) {
+    if (sellerSelected.isWinner) {
       successNotification.notifySuccess(`El vendedor ${sellerSelected.name} ha alcanzado ${sellerSelected.score} puntos`);
+    }else{
+      successNotification.notifySuccess("Imagen seleccionada correctamente");
     }
+
+    const cleaner = useDataCleaner();
+    cleaner.clearImagesData();
+    query.value = '';
 
   }else{
     errorNotification.notifyError('La carrera ha finalizado');
@@ -149,4 +170,31 @@ watch(query, (newVal) => {
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 16px;
 }
+
+/**.image-grid {
+  display: grid;
+  gap: 12px;
+  padding: 10px;
+  justify-content: center;
+
+  grid-template-columns: repeat(1, 1fr);
+
+  @media (min-width: 600px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: 900px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (min-width: 1200px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  @media (min-width: 1500px) {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}*/
+
+
 </style>

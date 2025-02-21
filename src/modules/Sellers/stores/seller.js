@@ -23,7 +23,7 @@ export const useSellerStore = defineStore('seller', {
         .then((response) => {
           this.sellers = response.data.map(sellerData => Seller({
             ...sellerData,
-            avatar: SellerService.getAvatarUrl(),
+            avatar: SellerService.getAvatarUrl(sellerData.id),
           }));
         })
         .catch((error) => (this.error = error))
