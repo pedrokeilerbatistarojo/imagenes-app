@@ -1,6 +1,6 @@
-import {useSellerStore} from "src/modules/Sellers/stores/seller.js";
-import {Image} from "src/modules/Images/models/Image.js";
-import configImages from "src/modules/Images/config/configImages.js";
+import {useSellerStore} from "src/modules/Sellers/infrastructure/stores/seller.js";
+import {Image} from "src/modules/Images/domain/models/Image.js";
+import configImages from "src/modules/Images/infrastructure/config/configImages.js";
 import UtilService from "src/modules/shared/services/UtilService.js";
 
 export default {

@@ -1,4 +1,4 @@
-import {useSellerStore} from "src/modules/Sellers/stores/seller.js";
+import {useSellerStore} from "src/modules/Sellers/infrastructure/stores/seller.js";
 import localStorageService from "src/modules/shared/services/LocalStorageService.js";
 
 export default {

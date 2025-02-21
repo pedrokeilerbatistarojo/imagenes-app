@@ -1,4 +1,4 @@
-import {useInvoiceStore} from "src/modules/Invoices/stores/invoice.js";
+import {useInvoiceStore} from "src/modules/Invoices/infrastructure/stores/invoice.js";
 import LocalStorageService from "src/modules/shared/services/LocalStorageService.js";
 
 export default {

@@ -1,7 +1,7 @@
-import { useInvoiceStore } from "src/modules/Invoices/stores/invoice.js";
-import { useSellerStore } from "src/modules/Sellers/stores/seller.js";
-import { SimplifiedSeller } from "src/modules/Sellers/models/SimplifiedSeller.js";
-import { Product } from "src/modules/Invoices/models/Product.js";
+import { useInvoiceStore } from "src/modules/Invoices/infrastructure/stores/invoice.js";
+import { useSellerStore } from "src/modules/Sellers/infrastructure/stores/seller.js";
+import { SimplifiedSeller } from "src/modules/Sellers/domain/models/SimplifiedSeller.js";
+import { Product } from "src/modules/Invoices/domain/models/Product.js";
 import ScoreService from "src/modules/Invoices/services/ScoreService.js";
 import fakerDataService from "src/modules/Invoices/services/FakerDataService.js";
 import FormatService from "src/modules/shared/services/FormatService.js";
