@@ -1,8 +1,0 @@
-
-config-test.cjs
-node_modules/
-sessions/
-persist-session/
-persist-media-items/
-.DS_Store
-
