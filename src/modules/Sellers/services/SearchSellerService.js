@@ -1,4 +1,5 @@
 import {useSellerStore} from "src/modules/Sellers/stores/seller.js";
+import localStorageService from "src/modules/shared/services/LocalStorageService.js";
 
 export default {
   getSellerByImageId(imageId)  {
@@ -13,7 +14,14 @@ export default {
     return sellerStore.sellers.filter(seller => seller.name.toLowerCase().includes(term));
   },
   async fetchSellers(params = {}){
+    const sellers = localStorageService.getItem('sellers');
     const sellerStore = useSellerStore();
+
+    if(sellers) {
+      sellerStore.sellers = sellers;
+      return sellerStore.sellers;
+    }
+
     return await sellerStore.fetchSellers(params);
   },
   getStoreSellers(){
@@ -23,5 +31,10 @@ export default {
   countSellers() {
     const sellerStore = useSellerStore();
     return sellerStore.sellers.length;
+  },
+  getWinnerSeller(){
+    const sellerStore = useSellerStore();
+    const winner = sellerStore.sellers.find(sellerItem => sellerItem.isWinner === true);
+    return winner || null;
   }
 };

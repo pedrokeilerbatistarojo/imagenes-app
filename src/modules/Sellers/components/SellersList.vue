@@ -114,7 +114,7 @@ import InputValidationService from "src/modules/Images/services/InputValidationS
 import CreatorInvoiceService from "src/modules/Invoices/services/CreatorInvoiceService.js";
 import { useDataCleaner } from "src/modules/shared/composables/Cleaner.js";
 
-const { winner, error, loading } = storeToRefs(useSellerStore());
+const { error, loading } = storeToRefs(useSellerStore());
 
 const errorNotification = useErrorNotification();
 const successNotification = useSuccessNotification();
@@ -205,7 +205,9 @@ watch(query, (newVal) => {
 
 const isEmptySellers = computed(() => sellerList.value.length === 0);
 
-const existWinner = computed(() => winner.value !== null);
+const existWinner = computed(() => {
+  return sellerList.value.some(sellerItem => sellerItem.isWinner === true);
+});
 
 </script>
 

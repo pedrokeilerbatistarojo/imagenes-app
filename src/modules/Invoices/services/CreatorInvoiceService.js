@@ -6,6 +6,7 @@ import ScoreService from "src/modules/Invoices/services/ScoreService.js";
 import fakerDataService from "src/modules/Invoices/services/FakerDataService.js";
 import FormatService from "src/modules/shared/services/FormatService.js";
 import LocalStorageService from "src/modules/shared/services/LocalStorageService.js";
+import SearchSellerService from "src/modules/Sellers/services/SearchSellerService.js";
 
 export default {
   /**
@@ -27,7 +28,7 @@ export default {
     try{
       const invoiceStore = useInvoiceStore();
       const sellerStore = useSellerStore();
-      const winner = sellerStore.winner;
+      const winner = SearchSellerService.getWinnerSeller();
 
       const winnerModel = SimplifiedSeller(winner);
       const sellers = sellerStore.sellers.map(seller => SimplifiedSeller(seller));

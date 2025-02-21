@@ -3,13 +3,13 @@ import { api } from 'boot/axios';
 import {Seller} from "src/modules/Sellers/models/Seller.js";
 import SellerService from "src/modules/Sellers/services/SellerService.js";
 import configImages from "src/modules/Images/config/configImages.js";
+import LocalStorageService from "src/modules/shared/services/LocalStorageService.js";
 
 export const useSellerStore = defineStore('seller', {
   state: () => ({
     loading: false,
     sellers: [],
     seller: null,
-    winner: null,
     error: null,
   }),
   actions: {
@@ -25,6 +25,7 @@ export const useSellerStore = defineStore('seller', {
             ...sellerData,
             avatar: SellerService.getAvatarUrl(sellerData.id),
           }));
+          LocalStorageService.setItem('sellers', this.sellers);
         })
         .catch((error) => (this.error = error))
         .finally(() => {
@@ -42,11 +43,10 @@ export const useSellerStore = defineStore('seller', {
         seller.score += points;
 
         seller.isWinner = seller.score >= configImages.winnerPoints;
-        if (seller.isWinner) {
-          this.winner = seller;
-        }
 
+        LocalStorageService.setItem('sellers', this.sellers);
         return true;
+
       } else {
         console.error(`Seller con id ${sellerId} no encontrado`);
       }
@@ -56,7 +56,7 @@ export const useSellerStore = defineStore('seller', {
         seller.score = 0;
         seller.isWinner = false;
       });
-      this.winner = null;
+      LocalStorageService.setItem('sellers', this.sellers);
     },
   }
 });
