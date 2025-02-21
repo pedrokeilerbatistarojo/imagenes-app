@@ -82,9 +82,3 @@ const leftDrawerOpen = ref(true);
 const toggleLeftDrawer = () => leftDrawerOpen.value = !leftDrawerOpen.value
 </script>
 
-
-<style>
-.q-layout__shadow:after {
-  box-shadow: 0 0 10px -3px rgba(0, 0, 0, 0.2), 0 0 0 rgba(0, 0, 0, -1)!important;
-}
-</style>
