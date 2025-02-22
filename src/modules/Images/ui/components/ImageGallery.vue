@@ -17,8 +17,13 @@
         class="image-grid"
         v-if="!loading"
       >
-        <q-card v-for="image in images" :key="image.id" flat bordered>
-          <q-item class="q-pa-sm">
+        <q-card
+          v-for="image in images"
+          :key="image.id"
+          flat
+          bordered
+        >
+          <q-item class="q-pa-sm ">
             <q-item-section avatar>
               <q-avatar>
                 <img :src=image.seller.avatar alt="avatar">
@@ -43,7 +48,15 @@
             </q-card-actions>
           </q-item>
 
-          <q-img :src="image.urls.small" :alt="image.alt_description" fit="cover" style="height: 200px" />
+          <q-img
+            class="cursor-pointer"
+            @click="handleShowImage(image)"
+            :src="image.urls.small"
+            :alt="image.alt_description"
+            fit="cover"
+            style="height: 200px" >
+              <q-tooltip>{{image.alt_description}}</q-tooltip>
+          </q-img>
         </q-card>
       </transition-group>
 
@@ -53,6 +66,13 @@
 
     </div>
   </div>
+
+  <ImageDialog
+    v-model="showImageDialog"
+    :image="imageSelected"
+    @selected="handleSelectPicture"
+    @cancel="handleCancelDialog"
+    />
 </template>
 
 <script setup>
@@ -70,6 +90,7 @@ import SearchSellerService from "src/modules/Sellers/services/SearchSellerServic
 import SellerService from "src/modules/Sellers/services/SellerService.js";
 import EmptyBanner from "src/modules/Shared/ui/components/EmptyBanner.vue";
 import { useDataCleaner } from "src/modules/Shared/services/composables/Cleaner.js";
+import ImageDialog from "src/modules/Images/ui/components/ImageDialog.vue";
 
 const { loading, images } = storeToRefs(useGalleryStore());
 
@@ -81,6 +102,8 @@ const perPage = computed(() => SearchSellerService.countSellers());
 const successNotification = useSuccessNotification();
 const errorNotification = useErrorNotification();
 const empty = computed(() => images.value.length === 0 && !loading.value);
+const showImageDialog = ref(false);
+const imageSelected = ref(null);
 
 /**
  * Method to search for images
@@ -151,10 +174,23 @@ const handleSelectPicture = (id) => {
     cleaner.clearImagesData();
     query.value = '';
 
+    handleCancelDialog();
+
   }else{
     errorNotification.notifyError('La carrera ha finalizado');
   }
 };
+
+const handleShowImage = (imageData) => {
+  console.log(imageData);
+  imageSelected.value = imageData;
+  showImageDialog.value = true;
+}
+
+const handleCancelDialog = () => {
+  showImageDialog.value = false;
+  imageSelected.value = null;
+}
 
 watch(query, (newVal) => {
   if (newVal.length === 0) {
