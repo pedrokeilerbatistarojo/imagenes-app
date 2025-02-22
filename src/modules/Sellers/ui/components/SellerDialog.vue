@@ -11,7 +11,9 @@
             </q-item-section>
 
             <q-item-section>
-              <q-item-label class="lexend" lines="1">{{ seller.name }}</q-item-label>
+              <q-item-label class="lexend" lines="1">
+                {{ seller.name }} <q-icon v-if="seller.isWinner" color="primary" name="emoji_events" />
+              </q-item-label>
               <q-item-label caption lines="2">
                 <span class="text-weight-bold">{{ seller.status }}</span>
                 | {{ seller.observations }}
@@ -26,7 +28,7 @@
             </q-item-section>
 
             <q-item-section side top>
-              <span v-if="seller.isWinner" class="font-size-12 text-primary fw-bold">Ganador</span>
+
             </q-item-section>
           </q-item>
         </q-list>
@@ -35,7 +37,7 @@
 
       <q-card-section>
         <div v-if="seller.images.length > 0"  class="row q-col-gutter-md">
-          <q-card v-for="image in seller.images" :key="image.id" class="col-3 q-pt-sm" flat>
+          <q-card v-for="image in seller.images" :key="image.id" class="col-12 q-pt-sm" flat>
             <q-img :src="image.urls.small" :alt="image.alt_description" fit="cover" style="height: 100px" />
           </q-card>
         </div>

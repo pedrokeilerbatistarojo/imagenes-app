@@ -68,7 +68,7 @@
           <q-item-section>
             <q-item-label lines="1" class="lexend">{{seller.name}}</q-item-label>
             <q-item-label caption lines="2">
-              <BadgeComponent class="q-mx-sm" :textValue="seller.status" />
+              <BadgeComponent :textValue="seller.status" />
               {{seller.observations}}
             </q-item-label>
           </q-item-section>
