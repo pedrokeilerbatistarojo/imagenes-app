@@ -1,6 +1,34 @@
-# Prueba técnica: Frontend Vuejs
+# Prueba técnica Alegra: Frontend Vuejs
 
-Reto: 💥
+## Architecture details
+- Clean Architecture
+- DDD (Domain-Driven Design)
+- Clean Code
+- Basic Auth
+
+## Tech stack
+
+- Vue 3
+- Quasar Framework 2
+- Pinia for state management
+- Unsplash SDK | API
+
+### Install the dependencies
+```bash
+npm install
+```
+
+### Launch the app for development
+```bash
+npm run dev
+```
+
+### Build the app for production
+```bash
+npm run build
+```
+
+# Reto:
 ## Vendedores ¡a correr!
 La empresa “Imágenes del mundo” ha realizado un concurso para sus vendedores, ¡una carrera para encontrar las imágenes más interesantes de la web!
 
@@ -26,24 +54,4 @@ La empresa “Imágenes del mundo” es la mejor empresa del mundo de imágenes,
 - La prueba debe quedar desplegada en un servidor de tu preferencia, este puede ser de carácter gratuito.
 - Debes enviar una URL donde se pueda visitar la herramienta desarrollada, el correo y la contraseña de la cuenta de Alegra con la cual haces la integración a través del link proporcionado en el correo donde te enviamos el reto.
 - La aplicación debe ser desarrollada con Vue.js.
-
-# Solución desarrollada
-Imagenes por el mundo App - Alegra Vue Test
-
-## Install the dependencies
-```bash
-yarn
-# or
-npm install
-```
-
-### Launch the app for development
-```bash
-npm run dev
-```
-
-### Build the app for production
-```bash
-npm run build
-```
 
