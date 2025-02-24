@@ -34,7 +34,10 @@ export const useSellerStore = defineStore('seller', {
         });
     },
     updateScore(sellerId, points) {
-      if(this.winner) {
+
+      const winner = this.sellers.some(sellerItem => sellerItem.isWinner === true);
+
+      if(winner) {
         console.error("Ya hay un ganador");
         return false;
       }
